@@ -1,0 +1,16 @@
+{
+  "name": "devlee/routing-system",
+  "description": "Hight performant routing system",
+  "autoload": {
+    "psr-4": {
+      "app\\": "./"
+    }
+  },
+  "authors": [
+    {
+      "name": "Dev Lee"
+    }
+  ],
+  "minimum-stability": "stable",
+  "require": {}
+}
