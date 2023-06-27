@@ -8,16 +8,15 @@ use app\router\Router;
 $router = new Router(__DIR__);
 
 $router->get("/", "@home");     // Opening home.php or home.html file;
-$router->get("/home", "@homde"); // Opening home.php or home.html file;
+$router->get("/home", "@home"); // Opening home.php or home.html file;
+
+$router->get("/test", "My Test Page");     // Print send and print data on page;
 
 $router->get("/contact", "@contact");
 $router->get("/product/{meta}", function($req, $res) {
-  $data = $req->params('');
+  $data = $req->params('meta');
 
-  echo '<pre>';
-  print_r($data);
-  echo '<br />';
-  echo '</pre>';
+  echo $data;
   exit;
 });
 
