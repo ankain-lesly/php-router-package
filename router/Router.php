@@ -24,6 +24,13 @@ class Router
     $this->response = new Response($root_directory);
   }
 
+  // Router config setup
+  public function config(string $views_folder, string $main_layout)
+  {
+    $this->response::$VIEWS_MAIN = $views_folder;
+    $this->response::$LAYOUT_MAIN = $main_layout;
+  }
+
   public function get($path, $callback)
   {
     //finding if there is any {?} parameter in $path

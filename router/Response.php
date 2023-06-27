@@ -13,6 +13,10 @@ namespace app\router;
 
 class Response
 {
+  // configs
+  public static ?string $VIEWS_MAIN = null;
+  public static ?string $LAYOUT_MAIN = null;
+
   public static string $ROOT_DIR;
   public static string $views_folder = 'views';
   // protected array $routes = [];
