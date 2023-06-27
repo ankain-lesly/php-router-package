@@ -113,7 +113,6 @@ class Router
         $callback = str_replace('@', '', $callback);
         return $response->render($callback);
       }
-      exit;
       return $response->content($callback);
     }
 

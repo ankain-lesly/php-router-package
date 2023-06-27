@@ -9,7 +9,7 @@ use app\router\Router;
 $router = new Router(__DIR__);
 
 // Router Configurations
-$router->config("views", "main");
+$router->config("views", "layouts/main");
 
 // $router->get($route, $handler);
 // Opening home.php or home.html file;

@@ -37,30 +37,76 @@ class Response
     $this->status(301);
     header("Location: $url");
   }
+
   public function content(string $text_content)
   {
     exit($text_content);
   }
-  public function render(string $view, $params = [])
+  public function render(string $view, array $params = [])
   {
     // Load Data into view
-    if ($params)
+    $view = $this->getView($view, $params);
+    $layout = $this->getLayout();
+    if ($layout) {
+      exit(str_replace("{{content}}", $view, $layout));
+    }
+
+    exit($view);
+  }
+  public function getView(string $view, $params = [])
+  {
+    // Load Data into view
+    if ($params) {
       foreach ($params as $key => $value) {
         $$key  = $value;
       }
+    }
 
     $file = self::$ROOT_DIR . '/' . $view;
+
+    if (self::$VIEWS_MAIN) {
+      $file = self::$ROOT_DIR . '/../' . self::$VIEWS_MAIN . '/' . $view;
+    }
+
     if (file_exists($file . ".php")) {
-      return include_once $file . ".php";
+      ob_start();
+      include_once $file . ".php";
+      return ob_get_clean();
     }
     if (file_exists($file . ".html")) {
-      return include_once $file . ".html";
+      ob_start();
+      include_once $file . ".html";
+      return ob_get_clean();
     }
 
     $message = 'Ooops! File Not found <br/>';
     $message .= $file . ".php | .html file does not exist!";
     $this->status(404)->content($message);
   }
+  public function getLayout()
+  {
+    $layout = self::$LAYOUT_MAIN;
+    if (!$layout) return false;
+
+    $file = self::$ROOT_DIR . '/../' . self::$VIEWS_MAIN . '/' . $layout;
+
+    if (file_exists($file . ".php")) {
+      ob_start();
+      include_once $file . ".php";
+      return ob_get_clean();
+    }
+    if (file_exists($file . ".html")) {
+      ob_start();
+      include_once $file . ".html";
+      return ob_get_clean();
+    }
+
+    $message = 'Ooops! File Not found <br/>';
+    $message .= $file . ".php | .html file does not exist!";
+    $this->status(404)->content($message);
+  }
+
+
   public function json(array $data)
   {
     return json_encode($data);
