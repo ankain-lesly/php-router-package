@@ -22,7 +22,7 @@ class Response
   {
     self::$ROOT_DIR =  $root_directory;
   }
- 
+
   public function status(int $code)
   {
     http_response_code($code);
@@ -40,21 +40,21 @@ class Response
   public function render(string $view, $params = [])
   {
     // Load Data into view
-    if($params) 
+    if ($params)
       foreach ($params as $key => $value) {
         $$key  = $value;
       }
 
-    $file = self::$ROOT_DIR .'/'.$view;
-    if(file_exists($file.".php")) {
-      return include_once $file.".php";
+    $file = self::$ROOT_DIR . '/' . $view;
+    if (file_exists($file . ".php")) {
+      return include_once $file . ".php";
     }
-    if(file_exists($file.".html")) {
-      return include_once $file.".html";
+    if (file_exists($file . ".html")) {
+      return include_once $file . ".html";
     }
 
     $message = 'Ooops! File Not found <br/>';
-    $message .= $file.".php | .html file does not exist!";
+    $message .= $file . ".php | .html file does not exist!";
     $this->status(404)->content($message);
   }
   public function json(array $data)

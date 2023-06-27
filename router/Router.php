@@ -27,13 +27,13 @@ class Router
   public function get($path, $callback)
   {
     //finding if there is any {?} parameter in $path
-    preg_match_all("/(?<={).+?(?=})/", $path, $paramMatches);
+    preg_match_all("/(?<={).+?(?=})/", $path, $paramMatchesKeys);
 
-    if (empty($paramMatches[0])) {
+    if (empty($paramMatchesKeys[0])) {
       return $this->routes['get'][$path] = $callback;
     }
 
-    $response = $this->getQueryParams($path, $paramMatches);
+    $response = $this->getQueryParams($path, $paramMatchesKeys[0]);
 
     if ($response) {
       $this->routes['get'][$response] = $callback;
@@ -46,50 +46,42 @@ class Router
     $this->routes['post'][$path] = $callback;
   }
 
-  public function getQueryParams($path, $paramMatches)
+  public function getQueryParams($path, $paramKey)
   {
     $uri = $this->request->path();
-
     $params = [];
-    $paramKey = [];
-    //setting parameters names
-    foreach ($paramMatches[0] as $key) {
-      $paramKey[] = $key;
-    }
-    //exploding path address
+
+    //exploding path and request uri string to array
     $path = explode("/", $path);
+    $reqUri = explode("/", $uri);
 
     //will store index number where {?} parameter is required in the $path 
     $indexNum = [];
 
     //storing index number, where {?} parameter is required with the help of regex
     foreach ($path as $index => $param) {
+
       if (preg_match("/{.*}/", $param)) {
         $indexNum[] = $index;
+        continue;
       }
-    }
 
-    //exploding request uri string to array to get
-    $reqUri = explode("/", $uri);
+      if ($path[$index] !== $reqUri[$index]) return implode('/', $path);
+    }
 
     //running for each loop to set the exact index number with reg expression
     foreach ($indexNum as $key => $index) {
-      //in case if req uri with param index is empty then return
-
       if (empty($reqUri[$index])) {
         return;
       }
-
       //setting params with params names
       $params[$paramKey[$key]] = $reqUri[$index];
+      $path[$index] = $reqUri[$index];
       // $reqUri[$index] = "{.*}";
     }
 
-    //converting array to sting
-    $reqUri = implode("/", $reqUri);
-
     $this->request->setParams($params);
-    return $reqUri;
+    return implode("/", $path);
   }
 
   public function resolve()
@@ -109,21 +101,26 @@ class Router
 
     //String Handler
     if (is_string($callback)) {
-      
-      if(str_contains($callback, '@')) {
+
+      if (str_contains($callback, '@')) {
         $callback = str_replace('@', '', $callback);
         return $response->render($callback);
       }
       exit;
       return $response->content($callback);
     }
-  
+
     //Array Handler
     if (is_array($callback)) {
       $callback[0] = new $callback[0]();
       // Application::$app->setController($callback[0]);
     }
 
-    return call_user_func($callback, $this->request, $response);
+    if (is_callable($callback)) {
+      return call_user_func($callback, $this->request, $response);
+    }
+
+    $message = "<b>Page Not Found..</b>";
+    return $response->content($message);
   }
 }
