@@ -48,6 +48,7 @@ class Request
   {
     return $this->method() === 'get';
   }
+  
   public function isPost()
   {
     return $this->method() === 'post';
@@ -97,10 +98,13 @@ class Request
     return $this->body;
   }
 
-  private function sanitizeParams(string $param)
+  private function sanitizeParams(string $value)
   {
     // return filter_input(INPUT_GET, $param, FILTER_SANITIZE_SPECIAL_CHARS);
-    return $param;
+    $value = htmlspecialchars($value);
+    $value = strip_tags($value);
+    $value = trim($value);
+    return $value;
   }
   /**
    * Methods

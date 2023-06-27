@@ -37,8 +37,14 @@ class Response
   {
     exit($text_content);
   }
-  public function render(string $view)
+  public function render(string $view, $params = [])
   {
+    // Load Data into view
+    if($params) 
+      foreach ($params as $key => $value) {
+        $$key  = $value;
+      }
+
     $file = self::$ROOT_DIR .'/'.$view;
     if(file_exists($file.".php")) {
       return include_once $file.".php";
@@ -49,7 +55,6 @@ class Response
 
     $message = 'Ooops! File Not found <br/>';
     $message .= $file.".php | .html file does not exist!";
-
     $this->status(404)->content($message);
   }
   public function json(array $data)
