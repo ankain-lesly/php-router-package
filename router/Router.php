@@ -4,6 +4,8 @@
 
 namespace app\router;
 
+use app\router\RouterException;
+
 /**
  * Class Router
  * 
@@ -16,19 +18,24 @@ class Router
   protected array $routes = [];
   public Request $request;
   public Response $response;
+  public static Router $router;
+
+  public static ?string $NOT_FOUND = null;
 
   public function __construct($root_directory)
   {
     // self::$ROOT_DIR = $root_directory;
     $this->request = new Request($root_directory);
     $this->response = new Response($root_directory);
+    self::$router = $this;
   }
 
   // Router config setup
-  public function config(string $views_folder, string $main_layout)
+  public function config(string $views_folder, string $main_layout, string $not_found_page)
   {
     $this->response::$VIEWS_MAIN = $views_folder;
     $this->response::$LAYOUT_MAIN = $main_layout;
+    self::$NOT_FOUND = $not_found_page;
   }
 
   public function get($path, $callback)
@@ -97,13 +104,10 @@ class Router
     $path = $this->request->path();
     $method = $this->request->method();
     $callback = $this->routes[$method][$path] ?? false;
-
+    // try {
     //Undefined Page Handler
     if ($callback === false) {
-      $response->status(404);
-      $message = "<b>Page Not Found..</b>";
-      return $response->content($message);
-      // return $response->render('_404');
+      throw new RouterException('some page is not available', 404);
     }
 
     //String Handler
@@ -126,7 +130,12 @@ class Router
       return call_user_func($callback, $this->request, $response);
     }
 
-    $message = "<b>Page Not Found..</b>";
-    return $response->content($message);
+    $message = "Error Validating request...</b>";
+    throw new RouterException($message, 500);
+    // return $response->content($message);
+
+    // } catch (RouterException $e) {
+    //   handleErrors::createError($e);
+    // }
   }
 }

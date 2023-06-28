@@ -68,20 +68,23 @@ class Response
       $file = self::$ROOT_DIR . '/../' . self::$VIEWS_MAIN . '/' . $view;
     }
 
+    if (!file_exists($file . ".php") && !file_exists($file . ".html"))
+      $file = self::$ROOT_DIR . '/' . self::$VIEWS_MAIN . '/' . $view;
+
     if (file_exists($file . ".php")) {
       ob_start();
       include_once $file . ".php";
       return ob_get_clean();
-    }
-    if (file_exists($file . ".html")) {
+    } elseif (file_exists($file . ".html")) {
       ob_start();
       include_once $file . ".html";
       return ob_get_clean();
     }
 
-    $message = 'Ooops! File Not found <br/>';
-    $message .= $file . ".php | .html file does not exist!";
-    $this->status(404)->content($message);
+    $file = self::$VIEWS_MAIN ? self::$VIEWS_MAIN . '/' : '';
+    $message = 'Ooops! Your file could not be located. <br />Check the filename and try again ';
+    $message .= "<mark><b> " . $file  . $view . ".php </b></mark> or <b>.html</b> file does not exist your directory!!!";
+    throw new RouterException($message, 444);
   }
   public function getLayout()
   {
@@ -90,26 +93,29 @@ class Response
 
     $file = self::$ROOT_DIR . '/../' . self::$VIEWS_MAIN . '/' . $layout;
 
+    if (!file_exists($file . ".php") && !file_exists($file . ".html"))
+      $file = self::$ROOT_DIR . '/' . self::$VIEWS_MAIN . '/' . $layout;
+
     if (file_exists($file . ".php")) {
       ob_start();
       include_once $file . ".php";
       return ob_get_clean();
-    }
-    if (file_exists($file . ".html")) {
+    } elseif (file_exists($file . ".html")) {
       ob_start();
       include_once $file . ".html";
       return ob_get_clean();
     }
 
-    $message = 'Ooops! File Not found <br/>';
-    $message .= $file . ".php | .html file does not exist!";
-    $this->status(404)->content($message);
+    $file = self::$LAYOUT_MAIN ? self::$LAYOUT_MAIN . '/' : '';
+    $message = 'Ooops! Your file could not be located. <br />Check the filename and try again ';
+    $message .= "<mark><b> " . $layout . ".php </b></mark> or <b>.html</b> file does not exist your directory!!!";
+    throw new RouterException($message, 444);
   }
 
 
   public function json(array $data)
   {
-    return json_encode($data);
+    exit(json_encode($data));
   }
 
 
