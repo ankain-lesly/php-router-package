@@ -11,17 +11,7 @@ class handleErrors
   private const SERVER_ERROR = 500;
   private const ROUTER_DIR_ERROR = 444;
 
-  // protected $message;
-  // protected $code;
-
-  // public function __construct(\Throwable $e)
-  // {
-  //   $this->message = $e->getMessage();
-  //   $this->code = $e->getCode();
-  //   $this->createError($e);
-  // }
-
-  public static function createError(\Throwable $e)
+  public static function createExceptionError(\Throwable $e)
   {
     $statusObject = array(
       self::VALIDATION_ERROR => [
@@ -64,10 +54,7 @@ class handleErrors
     $message = "<b>$title: </b>";
     $message .= $e->getMessage();
 
-    if ($e->getCode() === 404 && Router::$router::$NOT_FOUND) {
-      Router::$router->response->render(Router::$router::$NOT_FOUND);
-    }
-    Router::$router->response->content($message);
+    echo ($message);
     exit;
   }
 }

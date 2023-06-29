@@ -1,4 +1,4 @@
-<h2>My Blog Page</h2>
+<h2>My Blog</h2>
 
 <?php
 

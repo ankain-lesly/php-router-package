@@ -34,10 +34,10 @@ class Request
     $dir = explode('\\', $this->ROOT_DIR);
     $path = explode('/', $path);
 
-    $app_path = []; 
+    $app_path = [];
 
     foreach ($path as $key) {
-      if(!in_array($key, $dir)) {
+      if (!in_array($key, $dir)) {
         $app_path[] = $key;
       }
     }
@@ -48,7 +48,7 @@ class Request
   {
     return $this->method() === 'get';
   }
-  
+
   public function isPost()
   {
     return $this->method() === 'post';
@@ -69,7 +69,7 @@ class Request
   }
   public function params(string $key = null)
   {
-    if($key) return  $this->query_params[$key] ?? false;
+    if ($key) return  $this->query_params[$key] ?? false;
     return  $this->query_params;
   }
   //  BODY DATA
@@ -81,19 +81,21 @@ class Request
       }
     }
   }
-  public function body()
+  public function body(string $param_key = null)
   {
-    if ($this->method() === 'get') {
+    if ($this->isGet()) {
       foreach ($_GET as $key => $value) {
         $this->body[$key] = $this->sanitizeParams($value);
       }
     }
 
-    if ($this->method() === 'post') {
+    if ($this->isPost()) {
       foreach ($_POST as $key => $value) {
         $this->body[$key] = $this->sanitizeParams($value);
       }
     }
+
+    if ($param_key) return $this->body[$param_key] ?? false;
 
     return $this->body;
   }

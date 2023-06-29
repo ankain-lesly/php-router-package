@@ -2,22 +2,27 @@
 
 namespace app\controllers;
 
+use app\router\Request;
+use app\router\Response;
+
 class SiteController
 {
 
-  public function products($req, $res)
+  public function myBlog(Request $req, Response $res)
   {
-    $res->content("<h2>My Products Page</h2>");
+    // $res->content("<h2>My Blog Page</h2>");
+    $res->render('blog');
   }
-  public function product_details($req, $res)
+  public function product_details(Request $req, Response $res)
   {
-    $p_id = $req->params('product_id');
-    $page = "<h2>Product Details</h2>";
+    $blog_id = $req->params('blog_id');
+    // $content = "<h2>Product Details</h2>";
 
-    $page .= "<p>Details for product with ID : <b>$p_id</b></p>";
-    $res->content($page);
+    // $content .= "<p>Details for product with ID : <b>$blog_id</b></p>";
+    // $res->content($content);
+    $res->render('blog', ['blog_id' => $blog_id]);
   }
-  public function create_product($req, $res)
+  public function create_product(Request $req, Response $res)
   {
     if ($req->isPost()) {
       $data = $req->body();

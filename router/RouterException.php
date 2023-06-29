@@ -11,7 +11,7 @@ class RouterException extends \Exception
   {
     $this->message = $message;
     $this->code = $code;
-
-    handleErrors::createError($this);
+    handleErrors::createExceptionError($this);
+    exit;
   }
 }

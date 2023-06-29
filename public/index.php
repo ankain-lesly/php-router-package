@@ -11,6 +11,9 @@ $router = new Router(__DIR__);
 // Router Configurations
 $router->config("views", "layouts/main", "_404");
 
+// Validate requests with '_/' specifications and re-rout them accordingly
+$router->interceptRequest();
+
 // $router->get($route, $handler);
 // Opening home.php or home.html file;
 $router->get("/", "@home");
@@ -45,8 +48,8 @@ $router->post("/contact", function ($req, $res) {
 });
 
 
-$router->get("/products", [SiteController::class, 'products']);
-$router->get("/products/{product_id}", [SiteController::class, 'product_details']);
+$router->get("/blog", [SiteController::class, 'myBlog']);
+$router->get("/blog/{blog_id}", [SiteController::class, 'product_details']);
 $router->get("/create/product", [SiteController::class, 'create_product']);
 $router->post("/create/product", [SiteController::class, 'create_product']);
 

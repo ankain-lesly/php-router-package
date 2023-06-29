@@ -15,9 +15,10 @@ use app\router\RouterException;
 class Router
 {
   // public static string $ROOT_DIR;
-  protected array $routes = [];
-  public Request $request;
-  public Response $response;
+  private array $routes = [];
+  private Request $request;
+  private Response $response;
+  private static ?string $ROOT_DIR = '';
   public static Router $router;
 
   public static ?string $NOT_FOUND = null;
@@ -27,10 +28,15 @@ class Router
     // self::$ROOT_DIR = $root_directory;
     $this->request = new Request($root_directory);
     $this->response = new Response($root_directory);
+    self::$ROOT_DIR = $root_directory;
     self::$router = $this;
   }
 
   // Router config setup
+  public function setLayout(string $layout_dir)
+  {
+    return $this->response::$LAYOUT_MAIN = $layout_dir;
+  }
   public function config(string $views_folder, string $main_layout, string $not_found_page)
   {
     $this->response::$VIEWS_MAIN = $views_folder;
@@ -60,7 +66,7 @@ class Router
     $this->routes['post'][$path] = $callback;
   }
 
-  public function getQueryParams($path, $paramKey)
+  private function getQueryParams($path, $paramKey)
   {
     $uri = $this->request->path();
     $params = [];
@@ -107,7 +113,13 @@ class Router
     // try {
     //Undefined Page Handler
     if ($callback === false) {
-      throw new RouterException('some page is not available', 404);
+
+      if (self::$NOT_FOUND) {
+        $response
+          ->status(404)
+          ->render(Router::$router::$NOT_FOUND);
+      }
+      throw new RouterException('Oops! The page you are trying to access is not available.', 404);
     }
 
     //String Handler
@@ -126,16 +138,28 @@ class Router
       // Application::$app->setController($callback[0]);
     }
 
-    if (is_callable($callback)) {
-      return call_user_func($callback, $this->request, $response);
-    }
+    call_user_func($callback, $this->request, $response);
+  }
 
-    $message = "Error Validating request...</b>";
-    throw new RouterException($message, 500);
-    // return $response->content($message);
+  public function interceptRequest()
+  {
+    $server_root = $_SERVER['DOCUMENT_ROOT'];
+    $uri = $this->request->path();
 
-    // } catch (RouterException $e) {
-    //   handleErrors::createError($e);
-    // }
+    if (!str_contains($uri, '_/')) return;
+
+    $uri = explode('_/', $uri);
+    $uri = '/' . end($uri);
+
+    $app_root = str_replace('\\', "/", self::$ROOT_DIR);
+    $root = str_replace($server_root, '', $app_root);
+
+    $redirectTo = $root . $uri;
+
+    $this->response->redirect($redirectTo, 200);
+  }
+  public function getResponse()
+  {
+    return $this->response;
   }
 }

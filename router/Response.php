@@ -32,15 +32,28 @@ class Response
     http_response_code($code);
     return $this;
   }
-  public function redirect(string $url)
+  public function redirect(string $url, ?int $status_code = null)
   {
-    $this->status(301);
+    $code = $status_code ?? 301;
+    $this->status($code);
     header("Location: $url");
+    exit;
   }
 
   public function content(string $text_content)
   {
-    exit($text_content);
+    // Load Data into view
+    $view = $text_content;
+    $layout = $this->getLayout();
+    if ($layout) {
+      exit(str_replace("{{content}}", $view, $layout));
+    }
+
+    exit($view);
+  }
+  public function sendPage(string $page_content)
+  {
+    exit($page_content);
   }
   public function render(string $view, array $params = [])
   {
@@ -53,7 +66,12 @@ class Response
 
     exit($view);
   }
-  public function getView(string $view, $params = [])
+  public function json(array $data)
+  {
+    exit(json_encode($data));
+  }
+
+  private function getView(string $view, $params = [])
   {
     // Load Data into view
     if ($params) {
@@ -86,7 +104,7 @@ class Response
     $message .= "<mark><b> " . $file  . $view . ".php </b></mark> or <b>.html</b> file does not exist your directory!!!";
     throw new RouterException($message, 444);
   }
-  public function getLayout()
+  private function getLayout()
   {
     $layout = self::$LAYOUT_MAIN;
     if (!$layout) return false;
@@ -107,19 +125,11 @@ class Response
     }
 
     $file = self::$LAYOUT_MAIN ? self::$LAYOUT_MAIN . '/' : '';
-    $message = 'Ooops! Your file could not be located. <br />Check the filename and try again ';
+    $message = '<u>Getting Layout Failed.</u> Ooops! Your file could not be located. Check the filename and try again ';
     $message .= "<mark><b> " . $layout . ".php </b></mark> or <b>.html</b> file does not exist your directory!!!";
+
     throw new RouterException($message, 444);
   }
-
-
-  public function json(array $data)
-  {
-    exit(json_encode($data));
-  }
-
-
-
   /**
    * content => exit with text content
    * json => exit with json content
