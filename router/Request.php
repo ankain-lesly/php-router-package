@@ -17,7 +17,6 @@ class Request
   private array $query_params = [];
   public string $ROOT_DIR;
 
-
   public function __construct(string $root_dir)
   {
     $this->ROOT_DIR = $root_dir;
@@ -35,7 +34,6 @@ class Request
     $path = explode('/', $path);
 
     $app_path = [];
-
     foreach ($path as $key) {
       if (!in_array($key, $dir)) {
         $app_path[] = $key;
@@ -83,6 +81,15 @@ class Request
   }
   public function body(string $param_key = null)
   {
+    // Converts Raw Data into a PHP object
+    $data = json_decode(file_get_contents('php://input'), true);
+
+    if ($data) {
+      foreach ($data as $key => $value) {
+        $this->body[$key] = $this->sanitizeParams($value);
+      }
+    }
+
     if ($this->isGet()) {
       foreach ($_GET as $key => $value) {
         $this->body[$key] = $this->sanitizeParams($value);
@@ -108,10 +115,9 @@ class Request
     $value = trim($value);
     return $value;
   }
-  /**
-   * Methods
-   * 
-   * isGet = 'get'
-   * isPost = 'post'
-   */
+
+  // private function headers(string $value) {
+
+  // }
+
 }
